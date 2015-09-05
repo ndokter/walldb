@@ -1,0 +1,26 @@
+{% extends 'walldb/base.html' %}
+
+{% block main-content %}
+    <div class="container">
+        <div class="image-filter-controls">
+            <form action="" method="get">
+                {{ filter_form.ordering }}
+                {{ filter_form.resolution }}
+
+                <div class="clearfix"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <ul id="wallpaper-list" class="wallpapers"></ul>
+    </div>
+
+    <script type="text/javascript">
+        $('.image-filter-controls form select').on('change', function() {
+            $(this).closest('form').submit();
+        });
+
+        new WallpaperList($('#wallpaper-list'), '/api/v1/wallpaper/list/', {'copy_url_parameters': true})
+    </script>
+{% endblock %}

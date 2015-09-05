@@ -1,0 +1,65 @@
+{% extends 'walldb/base.html' %}
+
+{% block main-content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Roadmap</h2>
+
+                <span><strong>Features and things that have my attention right now</strong></span>
+                <ol>
+                    <li>improving code quality before adding more features</li>
+                    <li>tagging and searchability</li>
+                </ol>
+
+                <h2>Changelog</h2>
+
+                <span><strong>version 0.6 (current)</strong></span>
+                <ul>
+                    <li>publicly viewable user profiles</li>
+                    <li>improved page speed</li>
+                </ul>
+
+                <span><strong>version 0.5</strong></span>
+                <ul>
+                    <li>new sober clean design</li>
+                    <li>added voting/favorting controls on fullscreen wallpaper page (although this doesn't look really good right now)</li>
+                    <li>small fix for large screens</li>
+                    <li>fixed scraping bug causing integrity errors</li>
+                    <li>added simple login required message when trying to rate/favorite wallpapers while not authenticated</li>
+                </ul>
+
+                <span><strong>version 0.4</strong></span>
+                <p>Big focus on getting more and better content.</p>
+                <ul>
+                    <li>improved admin controls for approving wallpapers</li>
+                    <li>migrated users and wallpapers from old walldb.net</li>
+                    <li>it wasn't possible to migrate the user votes, because the hashes identifying the wallpapers have changed. Sorry about that.</li>
+                    <li>added another source for wallpaper scraping</li>
+                </ul>
+
+                <span><strong>version 0.3</strong></span>
+                <ul>
+                    <li>random ordering</li>
+                    <li>small fix for rated wallpapers ordering</li>
+                </ul>
+
+                <span><strong>version 0.2</strong></span>
+                <ul>
+                    <li>added basic wallpaper filtering controls</li>
+                </ul>
+
+                <span><strong>version 0.1</strong></span>
+                <p>Initial test version featuring:</p>
+                <ul>
+                    <li>small and normal thumbnails leading to full size wallpaper</li>
+                    <li>authentication: login and registration</li>
+                    <li>endless scrolling (loading wallpapers when scrolling down)</li>
+                    <li>favorites</li>
+                    <li>up and down voting</li>
+                    <li>automated scraping (turned off right now)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

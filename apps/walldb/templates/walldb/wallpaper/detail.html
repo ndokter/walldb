@@ -1,0 +1,14 @@
+{% extends 'walldb/base.html' %}
+
+{% block main-content %}
+    <script type="text/javascript">
+        $.get('/api/v1/wallpaper/{{ object.hash }}/', null, function(response) {
+            $('#main').append(
+                new Wallpaper(
+                    response,
+                    _.template($('#wallpaper-detail-template').html())
+                ).render()
+            );
+        });
+    </script>
+{% endblock %}

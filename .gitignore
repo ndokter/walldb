@@ -1,0 +1,6 @@
+*.pyc
+.idea/
+.DS_Store
+walldb/settings.py
+media/
+/static/

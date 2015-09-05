@@ -1,0 +1,28 @@
+{% extends 'walldb/base.html' %}
+{% load bootstrap3 %}
+
+{% block main-content %}
+    <div class="container">
+        <div class="row row-centered">
+            <div class="col-md-12">
+                <div class="user-list">
+                {% for user in object_list %}
+                    <a href="{% url 'walldb:user:details' user.pk %}">
+                        <div class="avatar">
+                            {% if user.walldb_profile.avatar %}
+                                <img src="{{ user.walldb_profile.avatar.url }}" />
+                            {% endif %}
+                        </div>
+                        <div class="details">
+                            {{ user.username }}<br />
+                            <span class="registration_date">
+                                Registered on {{ user.date_joined|date:"F Y" }}
+                            </span>
+                        </div>
+                    </a>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

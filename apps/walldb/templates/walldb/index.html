@@ -1,0 +1,57 @@
+{% extends 'walldb/base.html' %}
+
+{% block main-content %}
+    <div class="container">
+        <div id="site-activity" class="row">
+            <div class="col-md-8 latest-uploads">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 class="list-title">Latest uploads</h2>
+
+                        <ul id="wallpaper-list-latest" class="wallpapers wallpaper-list-small thumbnail-align-left"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2>About</h2>
+
+                        <p>
+                            WallDB makes wallpapers easily browsable.
+                        </p>
+
+                        <p>
+                            Current version: <a href="{% url 'walldb:changelog' %}">v0.6</a>. Contact me on Twitter for questions and comments.
+                        </p>
+
+                        <p></p>
+
+                        <a href="https://twitter.com/intent/tweet?screen_name=NigelDokter" class="twitter-mention-button" data-related="NigelDokter">Tweet to @NigelDokter</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+                    </div>
+                    <div class="col-md-12">
+                        <h2>Statistics</h2>
+
+                        <table class="table">
+                            <tr>
+                                <td>Wallpaper count</td>
+                                <td>{{ statistics.wallpaper_count }}</td>
+                            </tr>
+                            <tr>
+                                <td>Registered users</td>
+                                <td>
+                                    {{ statistics.user_count }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        new WallpaperList($('#wallpaper-list-latest'), '/api/v1/wallpaper/list/?ordering=-created&limit=12', {no_scroll: true})
+    </script>
+{% endblock %}

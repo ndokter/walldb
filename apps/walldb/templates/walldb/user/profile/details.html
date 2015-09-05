@@ -1,0 +1,55 @@
+{% extends 'walldb/base.html' %}
+
+{% block main-content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="user-profile-header">
+
+                    <div class="avatar-container">
+                        <div class="avatar">
+                            {% if context_user.walldb_profile.avatar %}
+                                <img src="{{ context_user.walldb_profile.avatar.url }}" />
+                            {% endif %}
+                        </div>
+
+                        {% if context_user == user %}
+                            <a href="{% url 'walldb:user:edit' %}">edit</a>
+                        {% endif %}
+                    </div>
+
+
+                    <div class="details">
+                        <h1>{{ context_user.username }}</h1>
+                        <span>Registered on {{ context_user.date_joined|date:"j F Y" }}</span><br />
+                        {% if user.is_authenticated and context_user == user %}
+                            {# Reference logged in user on purpose for safety to never expose emailaddresses #}
+                            <span>{{ user.email }} (private)</span><br />
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-7">
+                <h2 class="list-title">Favorited</h2>
+
+                <ul id="wallpapers-favorited" class="wallpapers thumbnail-align-left">
+                </ul>
+            </div>
+
+            <div class="col-md-5">
+                <h2 class="list-title">Upvoted</h2>
+
+                <ul id="wallpapers-rated" class="wallpapers wallpaper-list-small thumbnail-align-left">
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        new WallpaperList($('#wallpapers-favorited'), '/api/v1/wallpaper/favorites/list/?user={{ context_user.pk }}&limit=20');
+        new WallpaperList($('#wallpapers-rated'), '/api/v1/wallpaper/ratings/list/?user={{ context_user.pk }}&limit=20');
+    </script>
+{% endblock %}
