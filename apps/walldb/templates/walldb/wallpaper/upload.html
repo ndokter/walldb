@@ -1,31 +1,55 @@
 {% extends 'walldb/base.html' %}
-{% load bootstrap3 %}
+{% load static bootstrap3 %}
+
+{% block javascript %}
+    {{ block.super }}
+
+
+{% endblock %}
 
 {% block main-content %}
     <div class="container">
         <div class="row row-centered">
-            <div class="col-md-3"></div>
 
-            <div class="col-md-6">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
                 <h2>Upload</h2>
-                <p>Upload your own wallpapers (max 5 each time).</p>
+                <div class="row row-centered">
+                    <div class="col-md-6">
+                        <p>Upload your own wallpapers (max 5 each time). These will get visible after being accepted by an admin.</p>
 
-                <p>Note that the wallpapers need to be approved by an admin, which can take a few days.</p>
-                <form method="post" action="{% url 'walldb:wallpaper:upload' %}" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ formset.management_form }}
+                        <form method="post" action="{% url 'walldb:wallpaper:upload' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ formset.management_form }}
 
-                    {{ formset }}
+                            {{ formset.non_form_errors }}
 
-                    <!--{% for form in formset %}-->
-                        <!--{% bootstrap_form form %}-->
-                    <!--{% endfor %}-->
+                            {% bootstrap_formset formset %}
 
-                    <button type="submit" class="btn btn-default">Upload</button>
-                </form>
+                            <button type="submit" class="btn btn-default">Upload</button>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <p>Please follow these rules when uploading your own wallpapers:</p>
+                        <ul>
+                            <li>Appropiate images: no nudity, gore, racism, etc.</li>
+                            <li>Decent image quality</li>
+                            <li>Maximum image size of 10MB per wallpaper.</li>
+                            <li>The allowed file types are .png and .jpg</li>
+                        </ul>
+
+                        <p><strong>Your wallpaper could get rejected without any reason. You currently will not get notified of this
+                        in any way! This will get added in the near future though.</strong></p>
+
+                        <p>Accepted wallpapers will be visible in your <a href="{% url 'walldb:user:details' id=user.pk %}"> profile page</a> (see 'uploaded').</p>
+                    </div>
+                </div>
             </div>
-
-            <div class="col-md-3"></div>
+            <div class="col-md-2"></div>
         </div>
     </div>
+
+    <script type="text/javascript">
+
+    </script>
 {% endblock %}

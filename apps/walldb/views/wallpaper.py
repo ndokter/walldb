@@ -1,8 +1,17 @@
+import uuid
+from django.contrib import messages
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse_lazy
+from django.shortcuts import redirect
+
 from django.views.generic import DetailView, TemplateView
 from django.forms.formsets import formset_factory
 
+from apps.user.mixins import LoginRequiredMixin
 from apps.wallpaper.forms import ImageFilterForm, WallpaperForm
+from apps.wallpaper.helpers.image import create_thumbnail
 from apps.wallpaper.mixins.view import WallpaperMixin
+from apps.wallpaper.models import Thumbnail
 from apps.wallpaper.models.wallpaper import Wallpaper
 
 
@@ -25,7 +34,7 @@ class WallpaperDetailView(WallpaperMixin, DetailView):
         return self.wallpaper
 
 
-class WallpaperUploadView(TemplateView):
+class WallpaperUploadView(LoginRequiredMixin, TemplateView):
     template_name = 'walldb/wallpaper/upload.html'
 
     WallpaperFormSet = formset_factory(WallpaperForm,
@@ -45,8 +54,41 @@ class WallpaperUploadView(TemplateView):
     def post(self, request, *args, **kwargs):
         formset = self.WallpaperFormSet(request.POST, request.FILES)
 
-        if formset.is_valid():
-            # TODO work in progress
-            pass
+        if not formset.is_valid():
+            context = self.get_context_data(**kwargs)
+            context['formset'] = formset
 
-        return super(WallpaperUploadView, self).get(request, *args, **kwargs)
+            return self.render_to_response(context)
+
+        for form in formset:
+
+            if not form.cleaned_data.get('file'):
+                continue
+
+            uploaded_file = form.cleaned_data['file']
+            file_type, extension = uploaded_file.content_type.split('/')
+
+            wallpaper = form.save(commit=False)
+            wallpaper.uploaded_by = request.user
+            wallpaper.file.name = 'w_{}.{}'.format(str(uuid.uuid4()), extension)
+            wallpaper.save()
+
+            thumb_file = SimpleUploadedFile(
+                name='t_{}.{}'.format(str(uuid.uuid4()), wallpaper.extension),
+                content=create_thumbnail(wallpaper.file, wallpaper.extension),
+                content_type=uploaded_file.content_type
+            )
+
+            Thumbnail(wallpaper=wallpaper, file=thumb_file).save()
+
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            "Your wallpapers have succesfully been uploaded. They will get " +
+            "visible under 'uploaded' and to other users after they have been" +
+            "accepted."
+        )
+
+        return redirect(
+            reverse_lazy('walldb:user:details', kwargs={'id': request.user.pk})
+        )

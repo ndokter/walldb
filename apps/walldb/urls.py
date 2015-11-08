@@ -16,7 +16,7 @@ user_patterns = patterns('',
 
 wallpaper_patterns = patterns('',
     url(r'^list/$', wallpaper.WallpaperListView.as_view(), name='list'),
-    # url(r'^upload/$', wallpaper.WallpaperUploadView.as_view(), name='upload'),
+    url(r'^upload/$', wallpaper.WallpaperUploadView.as_view(), name='upload'),
     url(r'^(?P<hash>\w+)/$', wallpaper.WallpaperDetailView.as_view(), name='details'),
 )
 

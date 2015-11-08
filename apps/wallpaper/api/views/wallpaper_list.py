@@ -2,7 +2,7 @@ from rest_framework import filters
 from rest_framework.generics import ListAPIView
 
 from apps.wallpaper.filters import RandomOrderingFilter, \
-    WallpaperFavoritedFilter, WallpaperRatedFilter
+    WallpaperFavoritedFilter, WallpaperRatedFilter, WallpaperUploadedFilter
 from apps.wallpaper.models import Wallpaper
 from apps.wallpaper.serializers.wallpaper import WallpaperSerializer
 
@@ -49,4 +49,20 @@ class WallpaperRatedListAPIView(WallpaperListAPIView):
         # https://docs.djangoproject.com/en/1.8/topics/db/queries/#spanning-multi-valued-relationships
         return queryset\
             .exclude(ratings__user__walldb_profile__is_public=False)\
-            .exclude(ratings__score__lte=0)  # intented chaining for correct query
+            .exclude(ratings__score__lte=0)  # intended chaining for correct query
+
+
+class WallpaperUploadedListAPIView(WallpaperListAPIView):
+    filter_class = WallpaperUploadedFilter
+    ordering_fields = ('created',)
+    ordering = ('-created',)
+
+    def get_queryset(self):
+        queryset = super(WallpaperUploadedListAPIView, self).get_queryset()
+
+        # Its important to use an exclude here because of filter chaining from
+        # the filter set which causes double results
+        # https://docs.djangoproject.com/en/1.8/topics/db/queries/#spanning-multi-valued-relationships
+        return queryset\
+            .exclude(uploaded_by__isnull=True,
+                     uploaded_by__walldb_profile__is_public=False)

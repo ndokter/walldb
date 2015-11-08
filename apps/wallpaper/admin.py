@@ -5,16 +5,20 @@ from django.contrib import admin
 from apps.wallpaper.models.wallpaper import Wallpaper
 
 
-def make_active(modeladmin, request, queryset):
-    # Update the created date to improve the 'latest' ordering.
-    queryset.update(active=True,
-                    created=datetime.datetime.now())
+def accept(modeladmin, request, queryset):
+    for wallpaper in queryset:
+        wallpaper.accept()
+
+
+def reject(modelsadmin, request, queryset):
+    for wallpaper in queryset:
+        wallpaper.reject()
 
 
 class WallpaperAdmin(admin.ModelAdmin):
     list_filter = ('active',)
     list_display = ('dimensions', 'image_field', 'uploaded_by', 'active')
-    actions = [make_active]
+    actions = [accept, reject]
 
     def dimensions(self, obj):
         return '{object.width}x{object.height}'.format(object=obj)

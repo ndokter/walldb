@@ -53,7 +53,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 REST_FRAMEWORK = {
-    'PAGE_SIZE': 40,
+    'PAGE_SIZE': 5,
     'MAX_PAGINATE_BY': 100,
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_AUTHENTICATION_CLASSES': (

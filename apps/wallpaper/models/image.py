@@ -1,3 +1,5 @@
+import os
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import pre_delete
@@ -16,7 +18,7 @@ class Image(models.Model):
     size = models.IntegerField(blank=True, default=0)
     created = models.DateTimeField(db_index=True, auto_now_add=True)
     hash = models.CharField(db_index=True, max_length=40)
-    file = models.ImageField(upload_to='images/')
+    file = models.ImageField(upload_to='images/', null=False, blank=False)
     extension = models.CharField(max_length=5, blank=True, null=True)
 
     class Meta:
@@ -31,12 +33,16 @@ class Image(models.Model):
         return self.file.size
 
     def get_file_hash(self):
-        return file_hash(self.file)
+        f = open(self.file.path, 'r')
+
+        return file_hash(f)
 
     def save(self, **kwargs):
-        # Image dimensions and file size get set/updated when saving.
+        # Properties being extracted/generated for indexing purposes
         self.width, self.height = self.get_image_dimensions()
         self.size = self.get_file_size()
+        self.hash = self.get_file_hash()
+        self.extension = os.path.splitext(self.file.name)[1][1:]
 
         super(Image, self).save(**kwargs)
 

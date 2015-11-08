@@ -233,6 +233,11 @@ ul.wallpapers {
             display: none;
         }
 
+   ul.wallpapers .no-results {
+        font-size: 18px;
+        width: 100%;
+   }
+
 /* Wallpaper list filtering controls */
 .image-filter-controls {
 }
@@ -242,6 +247,9 @@ ul.wallpapers {
     }
 
 /* User profile */
+#user-profile-header {
+    margin-bottom: 15px;
+}
 .avatar {
     width: 57px;
     height: 57px;

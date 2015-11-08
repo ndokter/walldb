@@ -2,6 +2,8 @@ from PIL import Image as PILImage
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from apps.wallpaper.helpers.file import file_hash
@@ -47,22 +49,48 @@ class WallpaperForm(forms.ModelForm):
     MIN_IMAGE_PX_HEIGHT = 400
     MAX_IMAGE_PX_HEIGHT = 10000
 
+    MAX_FILE_SIZE = 10240  # in KB's
+
+    file = forms.ImageField(
+        widget=forms.FileInput(attrs={'data-max-file-size': MAX_FILE_SIZE})
+    )
+
     def clean_file(self):
         """
         Validate the file on the following:
+        - file size: check the maximum file size
         - hash: dont allow duplicate images
         - width: sensible min and max image width
         - height: sensible min and max image height
         - megapixels: the combined width and height should yield a minimal size
         """
+        # Check file size
+        if self.cleaned_data['file'] \
+                and self.cleaned_data['file']._size > self.MAX_FILE_SIZE * 1024:
+           raise ValidationError('Please limit the file size to under 10MB')
+
         # Check file hash.
         self.cleaned_data['file'].seek(0)
         image_hash = file_hash(self.cleaned_data['file'])
 
-        if Wallpaper.objects.filter(hash=image_hash).exists():
-            raise ValidationError(
-                'Wallpaper with hash \'{}\' already exists'.format(image_hash)
-            )
+        try:
+            wallpaper = Wallpaper.objects.get(hash=image_hash)
+        except Wallpaper.DoesNotExist:
+            pass
+        else:
+            error_msg = 'This wallpaper already exists'
+
+            if wallpaper.active is True:
+                error_msg += ' (<a href="{}" target="_blank">{}</a>)'.format(
+                    reverse('walldb:wallpaper:details', args=(image_hash,)),
+                    image_hash
+                )
+            elif wallpaper.active is None:
+                error_msg += ', but has not yet been accepted'
+            elif wallpaper.active is False:
+                error_msg += ', but was rejected based on quality or content'
+
+            raise ValidationError(mark_safe(error_msg))
 
         # Check image width and height.
         self.cleaned_data['file'].file.seek(0)
@@ -88,7 +116,7 @@ class WallpaperForm(forms.ModelForm):
         if (image_width * image_height) < WallpaperForm.MIN_PIXELS:
             raise ValidationError(
                 'Image size of \'{}x{}\' does not meet the minimum requirement'
-                'of at least 1.3 mega pixels (about \'1280x960\' for example).'
+                ' of at least 1.3 mega pixels (about \'1280x960\' for example).'
                 .format(image_width, image_height)
             )
 

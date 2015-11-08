@@ -43,3 +43,12 @@ class WallpaperRatedFilter(django_filters.FilterSet):
     class Meta:
         model = Wallpaper
         fields = ('user',)
+
+
+class WallpaperUploadedFilter(django_filters.FilterSet):
+
+    user = django_filters.CharFilter(name='uploaded_by')
+
+    class Meta:
+        model = Wallpaper
+        fields = ('user',)

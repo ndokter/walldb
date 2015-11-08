@@ -7,6 +7,6 @@ class TestScraper(Scraper):
     """
     def get_urls(self, limit):
         return (
-            'http://walldb.net/static/wallpapers/11e3bcf3cc796157f5d1f737880749.jpg',
-            # 'http://i891.photobucket.com/albums/ac111/alicep69/MaterialeGrafico/Ornamenti%20vari%20in%20png/nievesitaa.png',
+            # 'http://walldb.net/media/images/w_5c0bd20fcbeca27b84e36a4be5af0443c3a756db.jpeg',
+            'http://walldb.net/media/images/w_95d659129014e452d09420d2da8de3a99c2489a2.png',
         )

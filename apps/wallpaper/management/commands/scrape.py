@@ -5,6 +5,7 @@ import random
 import logging
 import requests
 import sys
+import uuid
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.base import ContentFile
@@ -64,55 +65,34 @@ class Command(BaseCommand):
         for url in urls:
             self.scrape(url)
 
-    # TODO make logic more reusable.
     def scrape(self, url):
         logger.info("Started downloading '%s'", url)
 
         response = requests.get(url, headers={'User-Agent': self.USER_AGENT})
-
         file_type, extension = response.headers.get('content-type').split('/')
 
-        form = WallpaperForm(files={'file': SimpleUploadedFile(
-            name='tmp.{extension}'.format(extension=extension),
+        downloaded_file = SimpleUploadedFile(
+            name='w_{}.{}'.format(str(uuid.uuid4()), extension),
             content=response.content,
             content_type=response.headers.get('content-type')
-        )})
+        )
+
+        form = WallpaperForm(files={'file': downloaded_file})
 
         if not form.is_valid():
             logger.info("Image '%s' did not validate: '%s'", url, form.errors)
-
             return
 
-        wallpaper = form.save(commit=False)
-        wallpaper.size = form.cleaned_data['file'].size
-        wallpaper.hash = file_hash(form.cleaned_data['file'])
-        form.cleaned_data['file'].file.seek(0)
-        wallpaper.width, wallpaper.height = Image.open(form.cleaned_data['file'].file).size
-        wallpaper.extension = extension
-        wallpaper.file.save(
-            'w_{hash}.{extension}'.format(hash=wallpaper.hash, extension=wallpaper.extension),
-            form.cleaned_data['file']
-        )
-        wallpaper.save()
+        wallpaper = form.save()
 
         logger.info("Saved image '%s' with hash '%s'", url, wallpaper.hash)
 
-        form.cleaned_data['file'].file.seek(0)
+        thumb_file = SimpleUploadedFile(
+            name='t_{}.{}'.format(str(uuid.uuid4()), wallpaper.extension),
+            content=create_thumbnail(wallpaper.file, wallpaper.extension),
+            content_type=response.headers.get('content-type')
+        )
 
-        thumb_file = create_thumbnail(form.cleaned_data['file'].file, extension)
-        thumb_width, thumb_height = Image.open(BytesIO(thumb_file)).size
-        thumbnail = Thumbnail(
-            size=sys.getsizeof(thumb_file),
-            wallpaper=wallpaper,
-            hash=file_hash(BytesIO(thumb_file)),
-            width=thumb_width,
-            height=thumb_height,
-            extension=extension
-        )
-        thumbnail.file.save(
-            't_{hash}.{extension}'.format(hash=thumbnail.hash, extension=extension),
-            ContentFile(thumb_file)
-        )
-        thumbnail.save()
+        Thumbnail(wallpaper=wallpaper, file=thumb_file).save()
 
         time.sleep(random.randint(1, 5))
