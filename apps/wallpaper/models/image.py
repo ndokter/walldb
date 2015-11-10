@@ -36,11 +36,13 @@ class Image(models.Model):
         return file_hash(self.file)
 
     def save(self, **kwargs):
-        # Properties being extracted/generated for indexing purposes
-        self.width, self.height = self.get_image_dimensions()
-        self.size = self.get_file_size()
-        self.hash = self.get_file_hash()
-        self.extension = os.path.splitext(self.file.name)[1][1:]
+        # TODO hack. Issues with the file not being opened in some cases.
+        if not self.hash:
+            # Properties being extracted/generated for indexing purposes
+            self.width, self.height = self.get_image_dimensions()
+            self.size = self.get_file_size()
+            self.hash = self.get_file_hash()
+            self.extension = os.path.splitext(self.file.name)[1][1:]
 
         super(Image, self).save(**kwargs)
 
