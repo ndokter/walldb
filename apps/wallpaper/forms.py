@@ -4,7 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
+from io import BytesIO
 
 from apps.wallpaper.helpers.file import file_hash
 from apps.wallpaper.models.wallpaper import Wallpaper
@@ -33,9 +33,9 @@ class ImageFilterForm(forms.Form):
         ('2560x2048', '2560x2048'),
     )
     ORDERING_CHOICES = (
-        ('random', _('Random')),
-        ('-created', _('Latest')),
-        ('created', _('First')),
+        ('random', 'Random'),
+        ('-created', 'Latest'),
+        ('created', 'First'),
     )
 
     resolution = forms.ChoiceField(choices=RESOLUTION_CHOICES, required=True)
@@ -58,16 +58,50 @@ class WallpaperForm(forms.ModelForm):
     def clean_file(self):
         """
         Validate the file on the following:
+        - file type: only allow .jpeg and .png
         - file size: check the maximum file size
         - hash: dont allow duplicate images
         - width: sensible min and max image width
         - height: sensible min and max image height
         - megapixels: the combined width and height should yield a minimal size
         """
+        file_name = self.cleaned_data['file'].name
+
+        # Check file type.
+        # We need to get a file object for PIL. We might have a path or we
+        # might have to read the data into memory.
+        if hasattr(self.cleaned_data['file'], 'temporary_file_path'):
+            f = self.cleaned_data['file'].temporary_file_path()
+        elif hasattr(self.cleaned_data['file'], 'read'):
+            f = BytesIO(self.cleaned_data['file'].read())
+        else:
+            f = BytesIO(self.cleaned_data['file']['content'])
+
+        try:
+            img = PILImage.open(f)
+        except Exception:
+            # Python Imaging Library doesn't recognize it as an image
+            raise ValidationError(
+                'Unsupported image type. Please upload png or jpeg. ({})'.format(
+                    file_name
+                )
+            )
+
+        if img.format not in ('PNG', 'JPEG'):
+            raise ValidationError(
+                'Unsupported image type. Please upload png or jpeg ({})'.format(
+                    file_name
+                )
+            )
+
         # Check file size
         if self.cleaned_data['file'] \
                 and self.cleaned_data['file']._size > self.MAX_FILE_SIZE * 1024:
-           raise ValidationError('Please limit the file size to under 10MB')
+            raise ValidationError(
+                'Please limit the file size to under 10MB ({})'.format(
+                    file_name
+                )
+            )
 
         # Check file hash.
         self.cleaned_data['file'].seek(0)
@@ -90,6 +124,8 @@ class WallpaperForm(forms.ModelForm):
             elif wallpaper.active is False:
                 error_msg += ', but was rejected based on quality or content'
 
+            error_msg += ' ({})'.format(file_name)
+
             raise ValidationError(mark_safe(error_msg))
 
         # Check image width and height.
@@ -98,17 +134,23 @@ class WallpaperForm(forms.ModelForm):
 
         if WallpaperForm.MIN_IMAGE_PX_WIDTH < image_width > WallpaperForm.MAX_IMAGE_PX_WIDTH:
             raise ValidationError(
-                "Wallpaper image width should be between '{}' and '{}' pixels".format(
+                "Wallpaper image width should be between '{}' and '{}' pixels"
+                " ({})"
+                .format(
                     WallpaperForm.MIN_IMAGE_PX_WIDTH,
-                    WallpaperForm.MAX_IMAGE_PX_WIDTH
+                    WallpaperForm.MAX_IMAGE_PX_WIDTH,
+                    file_name
                 )
             )
 
         if WallpaperForm.MIN_IMAGE_PX_HEIGHT < image_height > WallpaperForm.MAX_IMAGE_PX_HEIGHT:
             raise ValidationError(
-                "Wallpaper image height should be between '{}' and '{}' pixels".format(
+                "Wallpaper image height should be between '{}' and '{}' pixels"
+                " ({})"
+                .format(
                     WallpaperForm.MIN_IMAGE_PX_HEIGHT,
-                    WallpaperForm.MAX_IMAGE_PX_HEIGHT
+                    WallpaperForm.MAX_IMAGE_PX_HEIGHT,
+                    file_name
                 )
             )
 
@@ -116,8 +158,13 @@ class WallpaperForm(forms.ModelForm):
         if (image_width * image_height) < WallpaperForm.MIN_PIXELS:
             raise ValidationError(
                 'Image size of \'{}x{}\' does not meet the minimum requirement'
-                ' of at least 1.3 mega pixels (about \'1280x960\' for example).'
-                .format(image_width, image_height)
+                ' of at least 1.3 mega pixels (about \'1280x960\' for example)'
+                ' ({})'
+                .format(
+                    image_width,
+                    image_height,
+                    file_name
+                )
             )
 
         return self.cleaned_data['file']

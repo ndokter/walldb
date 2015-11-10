@@ -86,7 +86,7 @@ class WallpaperUploadView(LoginRequiredMixin, TemplateView):
             messages.SUCCESS,
             "Your wallpapers have succesfully been uploaded. They will get " +
             "visible under 'uploaded' and to other users after they have been" +
-            "accepted."
+            " accepted."
         )
 
         return redirect(

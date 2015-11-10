@@ -1,12 +1,6 @@
 {% extends 'walldb/base.html' %}
 {% load static bootstrap3 %}
 
-{% block javascript %}
-    {{ block.super }}
-
-
-{% endblock %}
-
 {% block main-content %}
     <div class="container">
         <div class="row row-centered">
@@ -16,9 +10,10 @@
                 <h2>Upload</h2>
                 <div class="row row-centered">
                     <div class="col-md-6">
-                        <p>Upload your own wallpapers (max 5 each time). These will get visible after being accepted by an admin.</p>
+                        <p>Upload your own wallpapers (max 5 each time). These will get visible after being accepted by an admin. This
+                           can take a couple of days.</p>
 
-                        <form method="post" action="{% url 'walldb:wallpaper:upload' %}" enctype="multipart/form-data">
+                        <form method="post" class="wallpaper-upload" action="{% url 'walldb:wallpaper:upload' %}" enctype="multipart/form-data">
                             {% csrf_token %}
                             {{ formset.management_form }}
 
@@ -35,13 +30,14 @@
                             <li>Appropiate images: no nudity, gore, racism, etc.</li>
                             <li>Decent image quality</li>
                             <li>Maximum image size of 10MB per wallpaper.</li>
-                            <li>The allowed file types are .png and .jpg</li>
+                            <li>The allowed file types are .png and .jpeg</li>
                         </ul>
 
                         <p><strong>Your wallpaper could get rejected without any reason. You currently will not get notified of this
                         in any way! This will get added in the near future though.</strong></p>
 
-                        <p>Accepted wallpapers will be visible in your <a href="{% url 'walldb:user:details' id=user.pk %}"> profile page</a> (see 'uploaded').</p>
+                        <p>Accepted wallpapers will be visible in your <a href="{% url 'walldb:user:details' id=user.pk %}">
+                            profile page</a> (see 'Uploaded by you').</p>
                     </div>
                 </div>
             </div>

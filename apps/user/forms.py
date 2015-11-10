@@ -5,7 +5,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from PIL import Image
 
@@ -13,8 +12,8 @@ from apps.user.models import UserProfile
 
 
 class LoginForm(forms.Form):
-    username = forms.CharField(max_length=254, label=_('Email'))
-    password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
+    username = forms.CharField(max_length=254, label='Email')
+    password = forms.CharField(label='Password', widget=forms.PasswordInput)
 
     def clean_username(self):
         return self.cleaned_data['username'].lower()
@@ -29,7 +28,7 @@ class LoginForm(forms.Form):
                                                 password=password)
 
         if not cleaned_data.get('user'):
-            raise forms.ValidationError(_("Invalid login credentials."))
+            raise forms.ValidationError('Invalid login credentials.')
 
         return cleaned_data
 
@@ -37,13 +36,13 @@ class LoginForm(forms.Form):
 class RegisterForm(forms.ModelForm):
     email = forms.EmailField()
     password = forms.CharField(
-        label=_("Password"),
+        label='Password',
         widget=forms.PasswordInput
     )
     password_confirmation = forms.CharField(
-        label=_("Password confirmation"),
+        label='Password confirmation',
         widget=forms.PasswordInput,
-        help_text=_("Enter the same password as above, for verification.")
+        help_text='Enter the same password as above, for verification.'
     )
 
     class Meta:
@@ -55,7 +54,7 @@ class RegisterForm(forms.ModelForm):
 
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError(
-                _("The email address '{}' is already registered".format(email))
+                "The email address '{}' is already registered".format(email)
             )
 
         return email.lower()
@@ -66,7 +65,7 @@ class RegisterForm(forms.ModelForm):
 
         if password != password_confirmation:
             raise forms.ValidationError(
-                _("The two password fields didn't match.")
+                "The two password fields didn't match."
             )
 
     @transaction.atomic
@@ -82,6 +81,11 @@ class RegisterForm(forms.ModelForm):
 
 
 class ProfileForm(forms.ModelForm):
+    MAX_AVATAR_SIZE = 100  # in KB's
+
+    avatar = forms.ImageField(
+        widget=forms.FileInput(attrs={'data-max-file-size': MAX_AVATAR_SIZE})
+    )
 
     def clean_avatar(self):
 
@@ -90,7 +94,7 @@ class ProfileForm(forms.ModelForm):
 
             if kilobytes > settings.MAX_AVATAR_FILE_SIZE:
                 raise ValidationError(
-                    _('File too large. It must be under 100kb.')
+                    'File too large. It must be under 100kb.'
                 )
 
         def validate_file_type(image_file):
@@ -108,12 +112,12 @@ class ProfileForm(forms.ModelForm):
             except Exception:
                 # Python Imaging Library doesn't recognize it as an image
                 raise ValidationError(
-                    _('Unsupported image type. Please upload bmp, png or jpeg.')
+                    'Unsupported image type. Please upload bmp, png or jpeg.'
                 )
 
             if img.format not in ('BMP', 'PNG', 'JPEG'):
                 raise ValidationError(
-                    _('Unsupported image type. Please upload bmp, png or jpeg.')
+                    'Unsupported image type. Please upload bmp, png or jpeg.'
                 )
 
         avatar = self.cleaned_data.get('avatar')

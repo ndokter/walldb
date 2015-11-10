@@ -181,6 +181,11 @@ header {
     color: #f1c40f;
 }
 
+/* Wallpaper upload */
+form.wallpaper-upload .help-block {
+    overflow: hidden;
+}
+
 /* Wallpaper list */
 h2.list-title {
     /*margin-left: 16px;*/

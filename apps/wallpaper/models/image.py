@@ -33,9 +33,7 @@ class Image(models.Model):
         return self.file.size
 
     def get_file_hash(self):
-        f = open(self.file.path, 'r')
-
-        return file_hash(f)
+        return file_hash(self.file)
 
     def save(self, **kwargs):
         # Properties being extracted/generated for indexing purposes
