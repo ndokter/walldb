@@ -19,7 +19,9 @@ class RandomOrderingFilter(filters.OrderingFilter):
         ordering = self.get_ordering(request, queryset, view)
 
         if '?' in ordering and hasattr(type(queryset), 'seeded_random'):
-            return queryset.seeded_random(request.query_params.get('seed', 0.0))
+            return queryset.seeded_random(
+                float(request.query_params.get('seed', 0.0))
+            )
 
         elif ordering:
             return queryset.order_by(*ordering)

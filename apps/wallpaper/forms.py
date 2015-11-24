@@ -98,7 +98,8 @@ class WallpaperForm(forms.ModelForm):
         if self.cleaned_data['file'] \
                 and self.cleaned_data['file']._size > self.MAX_FILE_SIZE * 1024:
             raise ValidationError(
-                'Please limit the file size to under 10MB ({})'.format(
+                'Please limit the file size to under {}MB ({})'.format(
+                    self.MAX_FILE_SIZE / 1024,
                     file_name
                 )
             )
