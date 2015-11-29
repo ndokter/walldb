@@ -49,5 +49,6 @@ def create_thumbnail(image_file, file_extension, thumbnail_width=300, thumbnail_
 
     temp_handle.close()
     img.close()
+    image_file.close()
 
     return image_bytes
