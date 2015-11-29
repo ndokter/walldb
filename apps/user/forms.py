@@ -1,14 +1,17 @@
 from io import BytesIO
+import uuid
 
 from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
 from django.conf import settings
 from PIL import Image
 
 from apps.user.models import UserProfile
+from apps.wallpaper.helpers.image import create_thumbnail
 
 
 class LoginForm(forms.Form):
@@ -81,52 +84,53 @@ class RegisterForm(forms.ModelForm):
 
 
 class ProfileForm(forms.ModelForm):
-    MAX_AVATAR_SIZE = 100  # in KB's
-
     avatar = forms.ImageField(
-        widget=forms.FileInput(attrs={'data-max-file-size': MAX_AVATAR_SIZE})
+        widget=forms.FileInput(
+            attrs={'data-max-file-size': settings.MAX_AVATAR_FILE_SIZE}
+        )
     )
 
     def clean_avatar(self):
 
-        def validate_file_size(image_file):
-            kilobytes = len(image_file) / 1024
-
-            if kilobytes > settings.MAX_AVATAR_FILE_SIZE:
-                raise ValidationError(
-                    'File too large. It must be under 100kb.'
-                )
-
-        def validate_file_type(image_file):
-            # We need to get a file object for PIL. We might have a path or we
-            # might have to read the data into memory.
-            if hasattr(image_file, 'temporary_file_path'):
-                f = image_file.temporary_file_path()
-            elif hasattr(image_file, 'read'):
-                f = BytesIO(avatar.read())
-            else:
-                f = BytesIO(image_file['content'])
-
-            try:
-                img = Image.open(f)
-            except Exception:
-                # Python Imaging Library doesn't recognize it as an image
-                raise ValidationError(
-                    'Unsupported image type. Please upload bmp, png or jpeg.'
-                )
-
-            if img.format not in ('BMP', 'PNG', 'JPEG'):
-                raise ValidationError(
-                    'Unsupported image type. Please upload bmp, png or jpeg.'
-                )
-
         avatar = self.cleaned_data.get('avatar')
 
-        if avatar:
-            validate_file_type(avatar)
-            validate_file_size(avatar)
+        # Validate file size.
+        kilobytes = len(avatar) / 1024
 
-        return avatar
+        if kilobytes > settings.MAX_AVATAR_FILE_SIZE:
+            raise ValidationError(
+                'File too large. It must be under {}KB.'.format(
+                    settings.MAX_AVATAR_FILE_SIZE
+                )
+            )
+
+        # Validate file extension.
+        if hasattr(avatar, 'temporary_file_path'):
+            f = avatar.temporary_file_path()
+        elif hasattr(avatar, 'read'):
+            f = BytesIO(avatar.read())
+        else:
+            f = BytesIO(avatar['content'])
+
+        try:
+            img = Image.open(f)
+        except Exception:
+            # Python Imaging Library doesn't recognize it as an image
+            raise ValidationError(
+                'Unsupported image type. Please upload bmp, png or jpeg.'
+            )
+
+        if img.format not in ('BMP', 'PNG', 'JPEG'):
+            raise ValidationError(
+                'Unsupported image type. Please upload bmp, png or jpeg.'
+            )
+
+        # Resize avatar with the thumbnail helper. This will crop the avatar to
+        # a 1:1 aspect ratio without stretching the image.
+        return SimpleUploadedFile(
+            name='t_{}.{}'.format(str(uuid.uuid4()), img.format),
+            content=create_thumbnail(avatar, img.format.lower(), 200, 200)
+        )
 
     class Meta:
         model = UserProfile

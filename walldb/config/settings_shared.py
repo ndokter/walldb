@@ -89,4 +89,4 @@ LOGGING = {
     }
 }
 
-MAX_AVATAR_FILE_SIZE = 100  # in kilobytes
+MAX_AVATAR_FILE_SIZE = 300  # in kilobytes

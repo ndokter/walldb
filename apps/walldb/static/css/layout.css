@@ -54,6 +54,9 @@ h2 {
     -webkit-box-shadow: none;
     box-shadow: none;
 }
+.img-rounded {
+    border-radius: 3px;
+}
 
 /* Images */
 ul.wallpapers .options a,
@@ -156,7 +159,6 @@ header {
 .wallpaper img {
     max-width: 100%;
     margin: auto;
-    border-radius: 0;
 }
 
 .wallpaper .meta .options,
@@ -186,6 +188,11 @@ form.wallpaper-upload .help-block {
     overflow: hidden;
 }
 
+/* Thumbnail */
+.thumbnail {
+    box-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+}
+
 /* Wallpaper list */
 h2.list-title {
     /*margin-left: 16px;*/
@@ -193,46 +200,46 @@ h2.list-title {
 
 ul.wallpapers {
     list-style: none;
-    margin: 0;
+    margin: 16px 0;
     padding: 0;
 }
     ul.wallpapers li {
         display: inline-block;
-        margin: 16px;
+        margin: 10px;
         position: relative;
     }
     ul.wallpapers.thumbnail-align-left li {
-        margin: 16px 32px 16px 0;
+        margin: 0 22px 19px 0;
     }
-        ul.wallpapers .thumbnail .meta {
-            color: #fff;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            display: none;
-            height: 25px;
-            background: #000;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-            opacity: 0.8;
+    ul.wallpapers .thumbnail .meta {
+        color: #fff;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        display: none;
+        height: 25px;
+        background: #000;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        opacity: 0.8;
+    }
+        ul.wallpapers .thumbnail .meta .resolution {
+            line-height: 23px;
         }
-            ul.wallpapers .thumbnail .meta .resolution {
-                line-height: 23px;
+        ul.wallpapers .thumbnail .meta .options {
+            line-height: 25px;
+            position: absolute;
+            left: 5px;
+            bottom: 0;
+        }
+            ul.wallpapers .thumbnail .meta .options a {
+                margin-right: 5px;
             }
-            ul.wallpapers .thumbnail .meta .options {
-                line-height: 25px;
-                position: absolute;
-                left: 5px;
-                bottom: 0;
-            }
-                ul.wallpapers .thumbnail .meta .options a {
-                    margin-right: 5px;
-                }
 
     /* Wallpaper list small */
     ul.wallpapers.wallpaper-list-small img {
-        max-width: 150px;
+        max-height: 110px;
     }
         ul.wallpapers.wallpaper-list-small .thumbnail .meta .options {
             display: none;
@@ -256,8 +263,8 @@ ul.wallpapers {
     margin-bottom: 15px;
 }
 .avatar {
-    width: 57px;
-    height: 57px;
+    width: 82px;
+    height: 82px;
     padding: 2px;
     background: #ccc;
     border-radius: 2px;

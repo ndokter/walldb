@@ -26,6 +26,9 @@ class Image(models.Model):
             ['width', 'height'],
         ]
 
+    def __unicode__(self):
+        return '{} ({}x{})'.format(self.hash, self.width, self.height)
+
     def get_image_dimensions(self):
         return self.file.width, self.file.height
 
@@ -36,7 +39,7 @@ class Image(models.Model):
         return file_hash(self.file)
 
     def save(self, **kwargs):
-        # TODO hack. Issues with the file not being opened in some cases.
+        # FIXME hack. Issues with the file not being opened in some cases.
         if not self.hash:
             # Properties being extracted/generated for indexing purposes
             self.width, self.height = self.get_image_dimensions()

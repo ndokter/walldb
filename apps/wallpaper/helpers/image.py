@@ -7,7 +7,7 @@ class UnsupportedFileExtensionError(Exception):
     pass
 
 
-def create_thumbnail(image_file, file_extension, thumbnail_width=255, thumbnail_height=188):
+def create_thumbnail(image_file, file_extension, thumbnail_width=300, thumbnail_height=200):
     if file_extension not in ('jpeg', 'png'):
         raise UnsupportedFileExtensionError(
             'File extension: \'{extension}\' not supported for thumbnail',
