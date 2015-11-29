@@ -49,3 +49,5 @@ class Command(BaseCommand):
         )
 
         Thumbnail(wallpaper=wallpaper, file=thumb_file).save()
+
+        thumb_file.close()
