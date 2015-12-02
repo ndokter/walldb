@@ -1,6 +1,6 @@
 from rest_framework.generics import RetrieveAPIView
 
-from apps.wallpaper.models import Wallpaper
+from apps.wallpaper.models.wallpaper import Wallpaper
 from apps.wallpaper.serializers.wallpaper import WallpaperSerializer
 
 

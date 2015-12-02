@@ -11,7 +11,7 @@ from apps.user.mixins import LoginRequiredMixin
 from apps.wallpaper.forms import ImageFilterForm, WallpaperForm
 from apps.wallpaper.helpers.image import create_thumbnail
 from apps.wallpaper.mixins.view import WallpaperMixin
-from apps.wallpaper.models import Thumbnail
+from apps.wallpaper.models.thumbnail import Thumbnail
 from apps.wallpaper.models.wallpaper import Wallpaper
 
 

@@ -2,7 +2,7 @@ from rest_framework import filters
 
 import django_filters
 
-from apps.wallpaper.models import Wallpaper
+from apps.wallpaper.models.wallpaper import Wallpaper
 
 
 class RandomOrderingFilter(filters.OrderingFilter):

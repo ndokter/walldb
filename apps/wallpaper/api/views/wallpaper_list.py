@@ -3,7 +3,7 @@ from rest_framework.generics import ListAPIView
 
 from apps.wallpaper.filters import RandomOrderingFilter, \
     WallpaperFavoritedFilter, WallpaperRatedFilter, WallpaperUploadedFilter
-from apps.wallpaper.models import Wallpaper
+from apps.wallpaper.models.wallpaper import Wallpaper
 from apps.wallpaper.serializers.wallpaper import WallpaperSerializer
 
 
